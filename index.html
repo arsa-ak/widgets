@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Residents Stats</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { background: #ffffff; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: transparent;
+    padding: 12px 12px 6px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: #fff;
+border: 1px solid #f7f7f7;
+    border-left: 4px solid #FFB821;
+    padding: 14px 16px;
+    transition: box-shadow 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  }
+
+  .card.active  { border-left-color: #FFB821; }
+  .card.deleted { border-left-color: #A32D2D; }
+  .card.total   { border-left-color: #888; }
+
+  .card-label {
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    color: #666;
+  }
+
+  .card-number {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 30px;
+    letter-spacing: -0.02em;
+    color: #1a1a1a;
+  }
+
+  .card-pct {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 600;
+    margin-top: 5px;
+    color: #999;
+  }
+
+  .bar-wrap {
+    background: #fff;
+        border: 1px solid #f7f7f7;
+    border-left: 4px solid #FFB821;
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.18s ease;
+  }
+  .bar-wrap:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
+
+  .bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    color: #888;
+  }
+
+  .bar-track {
+    height: 8px;
+    background: #A32D2D;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #FFB821;
+    transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bar-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7px;
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 700;
+  }
+  .bar-values .v-active  { color: #c47f00; }
+  .bar-values .v-deleted { color: #A32D2D; }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="card total">
+    <div class="card-label">Viso sukurta</div>
+    <div class="card-number" id="total">0</div>
+  </div>
+  <div class="card active">
+    <div class="card-label">Aktyvūs</div>
+    <div class="card-number" id="active-num">0</div>
+    <div class="card-pct" id="active-pct">0% nuo visų</div>
+  </div>
+  <div class="card deleted">
+    <div class="card-label">Ištrinti</div>
+    <div class="card-number" id="deleted-num">0</div>
+    <div class="card-pct" id="deleted-pct">0% nuo visų</div>
+  </div>
+</div>
+
+<div class="bar-wrap">
+  <div class="bar-labels">
+    <span>Aktyvūs</span>
+    <span>Ištrinti</span>
+  </div>
+  <div class="bar-track">
+    <div class="bar-fill" id="bar-fill"></div>
+  </div>
+  <div class="bar-values">
+    <span class="v-active" id="bar-active">0</span>
+    <span class="v-deleted" id="bar-deleted">0</span>
+  </div>
+</div>
+
+<script>
+  const ACTIVE  = 8604;
+  const DELETED = 578;
+  const TOTAL   = ACTIVE + DELETED;
+  const ACTIVE_PCT  = (ACTIVE  / TOTAL * 100);
+  const DELETED_PCT = (DELETED / TOTAL * 100);
+
+  function fmt(n) {
+    return Math.round(n).toLocaleString('lt-LT');
+  }
+
+  function countUp(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = fmt(target * ease);
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = fmt(target);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function pctCountUp(el, target, suffix, duration) {
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = (target * ease).toFixed(1) + suffix;
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = target.toFixed(1) + suffix;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const DURATION = 1400;
+
+  window.addEventListener('load', function() {
+    var rect = document.querySelector('.bar-wrap').getBoundingClientRect();
+    var pb = parseFloat(getComputedStyle(document.body).paddingBottom);
+    var h = Math.ceil(rect.bottom + pb);
+    document.documentElement.style.height = h + 'px';
+    document.body.style.height = h + 'px';
+  });
+
+  setTimeout(() => {
+    countUp(document.getElementById('total'),      TOTAL,   DURATION);
+    countUp(document.getElementById('active-num'), ACTIVE,  DURATION);
+    countUp(document.getElementById('deleted-num'),DELETED, DURATION);
+    countUp(document.getElementById('bar-active'), ACTIVE,  DURATION);
+    countUp(document.getElementById('bar-deleted'),DELETED, DURATION);
+    pctCountUp(document.getElementById('active-pct'),  ACTIVE_PCT,  '% nuo visų', DURATION);
+    pctCountUp(document.getElementById('deleted-pct'), DELETED_PCT, '% nuo visų', DURATION);
+    document.getElementById('bar-fill').style.width = ACTIVE_PCT.toFixed(2) + '%';
+  }, 120);
+</script>
+</body>
+</html>

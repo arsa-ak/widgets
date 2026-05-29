@@ -109,6 +109,15 @@ border: 1px solid #f7f7f7;
   }
   .bar-values .v-active  { color: #c47f00; }
   .bar-values .v-deleted { color: #A32D2D; }
+
+  .last-checked {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #bbb;
+    text-align: right;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
 </style>
 </head>
 <body>
@@ -142,6 +151,7 @@ border: 1px solid #f7f7f7;
     <span class="v-active" id="bar-active">0</span>
     <span class="v-deleted" id="bar-deleted">0</span>
   </div>
+  <div class="last-checked">Paskutinį kartą tikrinta: <span id="last-checked-date"></span></div>
 </div>
 
 <script>
@@ -188,6 +198,8 @@ border: 1px solid #f7f7f7;
     document.documentElement.style.height = h + 'px';
     document.body.style.height = h + 'px';
   });
+
+  document.getElementById('last-checked-date').textContent = new Date().toLocaleDateString('lt-LT');
 
   setTimeout(() => {
     countUp(document.getElementById('total'),      TOTAL,   DURATION);

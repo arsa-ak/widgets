@@ -154,7 +154,7 @@
 
 <script>
   const ACTIVE  = 8624;
-  const DELETED = 578;
+  const DELETED = 576;
   const TOTAL   = ACTIVE + DELETED;
   const ACTIVE_PCT  = (ACTIVE  / TOTAL * 100);
   const DELETED_PCT = (DELETED / TOTAL * 100);
@@ -205,8 +205,8 @@
     countUp(document.getElementById('deleted-num'),DELETED, DURATION);
     countUp(document.getElementById('bar-active'), ACTIVE,  DURATION);
     countUp(document.getElementById('bar-deleted'),DELETED, DURATION);
-    pctCountUp(document.getElementById('active-pct'),  ACTIVE_PCT,  '% nuo visų', DURATION);
-    pctCountUp(document.getElementById('deleted-pct'), DELETED_PCT, '% nuo visų', DURATION);
+    pctCountUp(document.getElementById('active-pct'),  ACTIVE_PCT,  '%', DURATION);
+    pctCountUp(document.getElementById('deleted-pct'), DELETED_PCT, '%', DURATION);
     document.getElementById('bar-fill').style.width = ACTIVE_PCT.toFixed(2) + '%';
   }, 120);
 </script>

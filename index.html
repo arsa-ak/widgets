@@ -156,8 +156,9 @@
 </div>
 
 <script>
-  const ACTIVE  = 8751;
-  const DELETED = 603;
+  const ACTIVE  = 8758;
+  const DELETED = 628;
+  const LAST_UPDATED = '2026-07-29';
   const TOTAL   = ACTIVE + DELETED;
   const ACTIVE_PCT  = (ACTIVE  / TOTAL * 100);
   const DELETED_PCT = (DELETED / TOTAL * 100);
@@ -200,7 +201,7 @@
     document.body.style.height = h + 'px';
   });
 
-  document.getElementById('last-checked-date').textContent = new Date().toLocaleDateString('lt-LT');
+  document.getElementById('last-checked-date').textContent = LAST_UPDATED;
 
   setTimeout(() => {
     countUp(document.getElementById('total'),      TOTAL,   DURATION);
